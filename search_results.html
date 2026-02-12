@@ -1,0 +1,49 @@
+<!-- templates/search_results.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Search Results</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Search Results for "{{ q }}"</h1>
+      <div class="actions">
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('add_ip') }}" target="_blank">➕ Add IP</a>
+
+      </div>
+    </header>
+
+    <section class="card">
+      {% if results and results|length > 0 %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>IP</th><th>Name</th><th>Type</th><th>Importance</th><th>Remark</th><th>Status</th><th>Last Checked</th></tr>
+          </thead>
+          <tbody>
+            {% for ip in results %}
+            <tr class="{{ 'down' if ip.last_status=='down' else 'up' }}">
+              <td><a href="{{ url_for('ip_detail', ip_id=ip.id) }}" target="_blank">{{ ip.ip }}</a></td>
+              <td>{{ ip.name or '-' }}</td>
+              <td>{{ ip.device_type or '-' }}</td>
+              <td>{{ ip.importance or '-' }}</td>
+              <td>{{ ip.remark or '-' }}</td>
+              <td>{{ ip.last_status or '-' }}</td>
+              <td>{{ ip.last_checked or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p>No results found for <strong>{{ q }}</strong>.</p>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!-- templates/index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>IP Monitor Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>IP Monitor Dashboard</h1>
+      <div class="actions">
+        <button id="btn-add" onclick="window.open('{{ url_for('add_ip') }}','_blank')">➕ Add IP (form)</button>
+        <a class="btn-export" href="{{ url_for('export_csv') }}">⬇️ Export CSV</a>
+      </div>
+    </header>
+
+    <!-- Heading 1: IP Dashboard -->
+    <section class="card">
+      <h2>IP Dashboard</h2>
+      <div class="controls">
+        <button id="btn-refresh">Refresh now</button>
+        <small class="muted">Auto-refresh every 30s</small>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>IP Address</th>
+              <th>Name</th>
+              <th>Device Type</th>
+              <th>Importance</th>
+              <th>Status</th>
+              <th>Ping (ms)</th>
+              <th>Last 5 min (%)</th>
+              <th>Last 1 hour (%)</th>
+              <th>Last Checked (UTC)</th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-body">
+            {% for ip in ips %}
+            <tr class="{{ 'down' if ip.last_status=='down' else 'up' }}">
+              <td><a href="{{ url_for('ip_detail', ip_id=ip.id) }}" target="_blank">{{ ip.ip }}</a></td>
+              <td>{{ ip.name or '-' }}</td>
+              <td>{{ ip.device_type or '-' }}</td>
+              <td>{{ ip.importance or '-' }}</td>
+              <td class="status">{{ ip.last_status }}</td>
+              <td class="ping">{{ ip.last_ping_ms if ip.last_ping_ms is not none else '-' }}</td>
+              <td class="{{ 'bad' if ip.last5 < 95 else 'good' }}">{{ "%.2f"|format(ip.last5) }}%</td>
+              <td class="{{ 'bad' if ip.last60 < 95 else 'good' }}">{{ "%.2f"|format(ip.last60) }}%</td>
+              <td class="checked">{{ ip.last_checked or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Heading 2: Add IP (instructions) -->
+    <section class="card">
+      <h2>Add IP Address</h2>
+      <p>Click <strong>Add IP (form)</strong> to open the add-IP form in a new tab. Fill IP, name, device type, importance and remark, then Save — it will be added to the dashboard automatically.</p>
+    </section>
+
+    <!-- Heading 3: Search -->
+    <section class="card">
+      <h2>Search IP</h2>
+      <form id="search-form" action="{{ url_for('search_page') }}" method="get">
+        <input name="q" placeholder="Search by IP, name or remark" />
+        <button type="submit">Search</button>
+      </form>
+      <div class="muted">Search results open on a new page.</div>
+    </section>
+
+    <footer class="footer">
+      <small>Uptime < 95% shown in red. Down IPs are displayed at top.</small>
+    </footer>
+  </div>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

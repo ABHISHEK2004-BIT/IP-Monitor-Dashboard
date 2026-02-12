@@ -1,0 +1,51 @@
+<!-- templates/add_ip.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Add IP</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container form-container">
+    <h1>Add / Edit IP</h1>
+    <form method="post" action="{{ url_for('add_ip') }}">
+      <label>IP Address
+        <input name="ip" required placeholder="e.g. 8.8.8.8" />
+      </label>
+
+      <label>Device Name
+        <input name="name" placeholder="Server / Camera / Switch" />
+      </label>
+
+      <label>Device Type
+        <select name="device_type">
+          <option value="cctv">CCTV</option>
+          <option value="server">Server</option>
+          <option value="switch">Switch</option>
+          <option value="pc">PC</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <label>Importance
+        <select name="importance">
+          <option value="critical">Critical</option>
+          <option value="important">Important</option>
+          <option value="normal" selected>Normal</option>
+        </select>
+      </label>
+
+      <label>Remark
+        <textarea name="remark" rows="3" placeholder="Any notes or location"></textarea>
+      </label>
+
+      <div class="form-actions">
+        <button type="submit">Save & Check</button>
+        <button type="button" onclick="window.close()">Close</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

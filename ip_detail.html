@@ -1,0 +1,54 @@
+<!-- templates/ip_detail.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>IP Detail - {{ ip.ip }}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Details — {{ ip.ip }}</h1>
+      <div class="meta">
+        <div><strong>Name:</strong> {{ ip.name or '-' }}</div>
+        <div><strong>Type:</strong> {{ ip.device_type or '-' }}</div>
+        <div><strong>Importance:</strong> {{ ip.importance or '-' }}</div>
+        <div><strong>Last Status:</strong> {{ ip.last_status or '-' }}</div>
+        <div><strong>Last Ping (ms):</strong> {{ ip.last_ping_ms if ip.last_ping_ms is not none else '-' }}</div>
+        <div><strong>Last Checked:</strong> {{ ip.last_checked or '-' }}</div>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>Ping history (last 60 minutes)</h2>
+      <canvas id="pingChart" width="900" height="300"></canvas>
+    </section>
+  </div>
+
+  <script>
+    const rawHistory = {{ history|tojson }};
+    const labels = rawHistory.map(r => new Date(r.ts).toLocaleTimeString());
+    const pings = rawHistory.map(r => r.ping_ms === null ? null : r.ping_ms);
+    const borderColors = rawHistory.map(r => r.status === 'up' ? 'rgba(34,139,34,0.9)' : 'rgba(220,20,60,0.9)');
+
+    const ctx = document.getElementById('pingChart').getContext('2d');
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: 'Ping (ms)',
+        data: pings,
+        borderColor: 'rgba(33,150,243,0.9)',
+        backgroundColor: 'rgba(33,150,243,0.05)',
+        tension: 0.2,
+        spanGaps: true,
+        pointBackgroundColor: borderColors,
+        pointRadius: 4
+      }]
+    };
+    new Chart(ctx, { type: 'line', data: data, options: { scales: { y: { beginAtZero: true } } } });
+  </script>
+</body>
+</html>
